@@ -12,7 +12,7 @@ abstract class Singleton{
       
       static $instances = array();
     
-      $class = get_called_class();
+      $classZZZ = get_called_class();
 
       if (isset($instances[$class]) === false){
           
