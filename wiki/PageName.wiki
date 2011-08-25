@@ -7,3 +7,8 @@ No code at this moment (project starting), but first raw files will be send soon
 
 = Details =
 
+To make this logger, i have to do some "dirty" code, but hey it's for a noble cause : get a log system really easy to use. However, i will try to make the best code possible, related to the need.
+
+= Performances =
+
+Most part of this library will be based on the debug_backtrace() php function, who provide nice reflexive informations. But i know that with this one the Log4GY system will probably less slower than some other log system. But honestly, who really care about that? IMO, loggers are made to find bugs, develop stronger and faster not to be a piece of art.
