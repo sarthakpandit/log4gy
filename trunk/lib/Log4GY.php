@@ -1,5 +1,7 @@
 <?php
 
+//TODO rajouter le paramettrage dans tous les sens pour les format des loggerss, les sorties choisies (multiples), etc.
+
 /**
  * Implémentation du patern Singleton.
  *
@@ -23,9 +25,79 @@ abstract class Singleton{
       return $instances[$class];  
    }
 
-   protected function __construct() {echo 'je suis construit papa', "\n";}
+   protected function __construct() {}
    
    protected function __clone() {}
+
+}
+
+/**
+* Classe contenant toutes les constantes statiques nécesssaires au fonctionnement de Log4GY.
+*
+* @version v0r0 (21 août 2011).
+* @author Effy - Aurélien GY <http://www.aureliengy.com>.
+*/
+class LogConst{
+    //TODO rajouter toutes les constantes
+}
+
+/**
+* Classe d'encapsulation de Log4GY, afin de permettre une utilisation simplifiée.
+*
+* @version v0r0 (21 août 2011).
+* @author Effy - Aurélien GY <http://www.aureliengy.com>.
+*/
+class Log {
+
+    private function __construct(){}
+
+    public static function info($message){
+
+        $message=  "INFO ->  $message" . PHP_EOL;
+
+        static::logLevel($message);
+        
+    }
+
+    public static function debug($message){
+
+        $message=  "DEBUG ->  $message" . PHP_EOL;
+
+        static::logLevel($message);
+    }
+
+    private function logLevel($message){
+
+        $logger = Log4GY::getInstance();
+
+        $logger->bwa($message);
+        
+    }
+
+    public static function conf($name){
+        
+        $logger = Log4GY::getInstance();
+
+        $logger->loadConfig($name);
+        
+    }
+
+
+    public static function start(){
+
+        $logger = Log4GY::getInstance();
+
+        $logger->profilStart();
+        
+    }
+
+    public static function stop(){
+
+        $logger = Log4GY::getInstance();
+
+        $logger->profilStop();
+        
+    }
 
 }
 
@@ -36,25 +108,26 @@ abstract class Singleton{
  * @author Effy - Aurélien GY <http://www.aureliengy.com>.
  */
 class Log4GY extends Singleton{
+    
     //Todo passer le nom du fichier de log (ou le pointeur vers fichier) en session, histoire d'écrire à la suite entre deux pages...
+    
     private $namePOTFile;
-    private $plop;
+
     private $tabProfiler;
     
     
     protected function __construct() {
         parent::__construct();
     
-        echo 'je suis construit', "\n";
-        
+        $this->tabProfiler = array();
         $seedDate = date('c');
         $this->namePOTFile = $seedDate . '.log.txt';
       
+        //TODO intialisation des fichiers / ouverture lecture ?
     }
     
     public function __destruct(){
-        echo 'je suis détruit', "\n";
-        
+        //TODO fermeture fichier.
     }
     
     public function loadConfig($namefile){
@@ -77,6 +150,7 @@ class Log4GY extends Singleton{
      * @return array {'file' = null, 'class' = null, 'function' = null}
      */
     private function getReflexiveInfo(){
+        
         //TODO rajouter la ligne obtenable depuis la trace
         $filePath = null;
         $className = null;
@@ -131,86 +205,67 @@ class Log4GY extends Singleton{
         return array('file' => $filePath, 'class' => $className, 'function' => $functionName);
     }
     
-    
-    public function profilStart($date){
+    //TODO finir la partie profilage
+    public function profilStart(){
+       
+        $time = microtime(true);
+        
+        $cellId = $this->getUniqueSignatureCall();
+        
+        //initialisation de la cellule
+        if(! isset($this->tabProfiler[$cellId])){
+            
+            $this->tabProfiler[$cellId] = array();
+            
+        }
+        
+        array_push($this->tabProfiler[$cellId], $time);
+        //Pile FIFO pour stoquer la date, en cas d'appels récursifs.
 
-        echo "date début : $date";
+        echo "date début : $time", PHP_EOL;
+        
+        //simulation
         sleep(2);
     }
     
-    public function profilStop($date){
-
-        echo "date fin : $date";
+    
+    public function profilStop(){
+        
+        $time = microtime(true);
+        $cellId = $this->getUniqueSignatureCall();
+        
+        if(! isset($this->tabProfiler[$cellId])){
+            
+            echo "date fin : $time";
+            
+        }else{
+            
+            $timeStart = array_pop($this->tabProfiler[$cellId]);
+            
+            $diff  = abs($timeStart - $time);
+            
+            echo "date fin : $time diff : $diff", PHP_EOL;
+            
+        }
+        
     }
+    
+    /**
+     * Génère un identifiant unique en fonction des parametres appelants initiaux.
+     * 
+     * @return String l'identifiant unique.
+     */
+    private function getUniqueSignatureCall(){
+        
+        $reflexiveCallInfo = $this->getReflexiveInfo();
+        
+        //TODO améliorer le systeme de génération d'identifiants uniques... Ya surement mieux possible !
+        $callId = md5($reflexiveCallInfo['file'] . $reflexiveCallInfo['class'] . $reflexiveCallInfo['function']);
+      
+        return $callId;
+        
+    }
+    
+    
 }
-
-/**
- * Classe d'encapsulation de Log4GY, afin de permettre une utilisation simplifiée.
- *
- * @version v0r0 (21 août 2011).
- * @author Effy - Aurélien GY <http://www.aureliengy.com>.
- */
-class Log {
-    
-    private $logInstance = null;
-    
-    private function __construct(){}
-    
-    public static function info($message){
-        
-        
-        $message=  "INFO ->  $message \n";
-        
-        self::logLevel($message);
-    }
-    
-    public static function debug($message){
-        
-        $message=  "DEBUG ->  $message \n";
-        
-        self::logLevel($message);
-    }
-    
-    private function logLevel($message){
-        
-        $logger = Log4GY::getInstance();
-
-        $logger->bwa($message);
-    }
-    
-    public static function conf($name){
-        $logger = Log4GY::getInstance();
-        
-        $logger->loadConfig($name);
-    }
-    
-    public static function start(){
-    
-        $logger = Log4GY::getInstance();
-    
-        $logger->profilStart(date("F j, Y, g:i a, s u"));
-    }
-    
-    public static function stop(){
-    
-        $logger = Log4GY::getInstance();
-    
-        $logger->profilStop(date("F j, Y, g:i a, s u"));
-    }
-    
-    //TODO rajouter un truc pour gérer les débuts / fins / date profilage de maniére auto
-}
-
-/**
- * Classe contenant toutes les constantes statiques nécesssaires au fonctionnement de Log4GY.
- *
- * @version v0r0 (21 août 2011).
- * @author Effy - Aurélien GY <http://www.aureliengy.com>.
- */
-class LogConst{
-    //TODO rajouter toutes les constantes
-}
-
-//TODO rajouter le paramettrage dans tous les sens pour les format des loggerss, les sorties choisies (multiples), etc.
-
 
