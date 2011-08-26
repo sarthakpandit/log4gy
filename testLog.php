@@ -1,33 +1,32 @@
 <?php
-
+//TODO modifier fichier ant pour qu'il n'y ai pas de conflit comme maintenant il est placé dans un dossier build.
 require_once('lib/HelloWorld.php');
 require_once('lib/Log4Gy.php');
 
-Log::info("Début - testLog.php", 1);
+Log::info("Début - testLog.php");
 
-Log::start(11);
+Log::start();
 
 $hw = new HelloWorld('Salut :D');
 
-Log::info("Milieu - testLog.php", 2);
+Log::info("Milieu - testLog.php");
 
-Log::conf("le fichier de conf 1", 2,2);
+Log::conf("le fichier de conf 1");
 
 $hw->doSpeack();
 
-Log::conf("le fichier de conf 2", 4);
+Log::conf("le fichier de conf 2");
 
 function beurj(){
-    Log::debug('Fin - testLog.php', 3);
+    Log::debug('Fin - testLog.php');
 }
 
 function jaimelespattes(){
 
     beurj();
-    Log::debug('Fin - sdsds.php', 3);
+    Log::debug('Fin - sdsds.php');
 }
 
 jaimelespattes();
-Log::stop(4);
-//du coup créer des fonction début / fin direct
-//
+
+Log::stop();

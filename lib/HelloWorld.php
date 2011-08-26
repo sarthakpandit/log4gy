@@ -5,18 +5,23 @@ class HelloWorld{
     private $message;
     
     public function __construct($message){
-        Log::info("Début - HelloWorld->HelloWorld()", 11);
+        
+        Log::info("Début - HelloWorld->HelloWorld()");
+        
         $this->message = $message;
-        Log::info("Fin - HelloWorld->HelloWorld()", 12);
+        
+        Log::info("Fin - HelloWorld->HelloWorld()");
         
     }
     
     public function doSpeack(){
-        Log::info("Début - HelloWorld->doSpeack()", 21);
         
-        echo 'Le message est : ', $this->message, "\n";
+        Log::info("Début - HelloWorld->doSpeack()");
         
-        Log::info("Fin - HelloWorld->doSpeack()", 22);
+        echo 'Le message est : ', $this->message, PHP_EOL;
+        
+        Log::info("Fin - HelloWorld->doSpeack()");
+        
     }
     
 }
