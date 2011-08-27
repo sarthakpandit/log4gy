@@ -1,5 +1,5 @@
 <?php
-//TODO modifier fichier ant pour qu'il n'y ai pas de conflit comme maintenant il est placé dans un dossier build.
+
 require_once('lib/HelloWorld.php');
 require_once('lib/Log4Gy.php');
 
