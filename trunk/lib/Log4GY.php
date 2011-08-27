@@ -99,6 +99,14 @@ class Log {
         
     }
 
+    //FIXME à virer, juste pour test
+    public static function getPOTFileName(){
+        
+        $logger = Log4GY::getInstance();
+        
+        echo $logger->getPOTFileName(), '<br />', PHP_EOL;
+        
+    }
 }
 
 /**
@@ -115,6 +123,10 @@ class Log4GY extends Singleton{
 
     private $tabProfiler;
     
+    //FIXME à virer, juste pour test
+    public function getPOTFileName(){
+        return $this->namePOTFile;
+    }
     
     protected function __construct() {
         parent::__construct();
@@ -140,7 +152,7 @@ class Log4GY extends Singleton{
         
         $reflexNames = $this->getReflexiveInfo();
         
-        echo 'appelant :', ' ligne ', $reflexNames['line'], ' function=',  $reflexNames['function'], ' class=', $reflexNames['class'], ' file=', $reflexNames['file'], '<br /><br />', PHP_EOL, PHP_EOL;
+        echo 'appelant :', ' ligne=', $reflexNames['line'], ' function=',  $reflexNames['function'], ' class=', $reflexNames['class'], ' file=', $reflexNames['file'], '<br /><br />', PHP_EOL, PHP_EOL;
     }
     
     /**
@@ -202,7 +214,7 @@ class Log4GY extends Singleton{
             
         }
         
-        return array('file' => $filePath, 'class' => $className, 'function' => $functionName);
+        return array('file' => $filePath, 'class' => $className, 'function' => $functionName, 'line' => $line);
     }
     
     public function profilStart(){
