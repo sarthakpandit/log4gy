@@ -7,9 +7,9 @@ class HelloWorld{
     public function __construct($message){
         
         Log::info("Début - HelloWorld->HelloWorld()");
-        
+
         $this->message = $message;
-        
+
         Log::info("Fin - HelloWorld->HelloWorld()");
         
     }
