@@ -53,7 +53,7 @@ class Log {
 
     public static function info($message){
 
-        $message=  "INFO ->  $message" . PHP_EOL;
+        $message=  "INFO ->  $message" . '<br />' . PHP_EOL;
 
         static::logLevel($message);
         
@@ -61,7 +61,7 @@ class Log {
 
     public static function debug($message){
 
-        $message=  "DEBUG ->  $message" . PHP_EOL;
+        $message=  "DEBUG ->  $message" . '<br />' . PHP_EOL;
 
         static::logLevel($message);
     }
@@ -70,7 +70,7 @@ class Log {
 
         $logger = Log4GY::getInstance();
 
-        $logger->bwa($message);
+        $logger->log($message);
         
     }
 
@@ -134,27 +134,28 @@ class Log4GY extends Singleton{
         $this->plop = $namefile;
     }
     
-    public function bwa($mess){
+    public function log($mess){
         echo 'bwa', $mess, "\n";
-        echo 'namefile', $this->namePOTFile, "\n";
+        echo 'namefile', $this->namePOTFile, '<br />', PHP_EOL;
         
         $reflexNames = $this->getReflexiveInfo();
         
-        echo 'appelant : function=',  $reflexNames['function'], ' class=', $reflexNames['class'], ' file=', $reflexNames['file'], "\n\n";
+        echo 'appelant :', ' ligne ', $reflexNames['line'], ' function=',  $reflexNames['function'], ' class=', $reflexNames['class'], ' file=', $reflexNames['file'], '<br /><br />', PHP_EOL, PHP_EOL;
     }
     
     /**
      * Méthode retournant les informations de la méthode appellante initiale.
-     * Permet de déterminer le fichier, la classe et la méthode/function ou est situé la demande de log.
+     * Permet de déterminer le fichier, la classe, la méthode/function et la ligne
+     * relatif à l'appel initial ou est situé la demande de log.
      * 
-     * @return array {'file' = null, 'class' = null, 'function' = null}
+     * @return array {'file' = null, 'class' = null, 'function' = null, 'line' = null}
      */
     private function getReflexiveInfo(){
         
-        //TODO rajouter la ligne obtenable depuis la trace
         $filePath = null;
         $className = null;
         $functionName = null;
+        $line = null;
         
         $trace = debug_backtrace(false); //possibilitée d'affiner via un bitmap pour gagner des perfs dans les futurs versions de php
         $traceSize = count($trace) - 1;
@@ -172,11 +173,10 @@ class Log4GY extends Singleton{
                 && ( ($trace[$traceCurseur]['function'] == 'info' ) || ($trace[$traceCurseur]['function'] == 'debug' ) ) ){
             
                 $filePath = $trace[$traceCurseur]['file'];
-                $className = null;
-                $functionName = null;
+                $line =  $trace[$traceCurseur]['line'];
                 
                 $find = true;
-            
+
             }else{
             
                 $traceCurseur--;
@@ -205,7 +205,6 @@ class Log4GY extends Singleton{
         return array('file' => $filePath, 'class' => $className, 'function' => $functionName);
     }
     
-    //TODO finir la partie profilage
     public function profilStart(){
        
         $time = microtime(true);
@@ -220,9 +219,9 @@ class Log4GY extends Singleton{
         }
         
         array_push($this->tabProfiler[$cellId], $time);
-        //Pile FIFO pour stoquer la date, en cas d'appels récursifs.
+        //Pile LIFO pour stoquer la date, en cas d'appels récursifs.
 
-        echo "date début : $time", PHP_EOL;
+        echo "date début : $time", '<br />', PHP_EOL;
         
         //simulation
         sleep(2);
@@ -244,7 +243,7 @@ class Log4GY extends Singleton{
             
             $diff  = abs($timeStart - $time);
             
-            echo "date fin : $time diff : $diff", PHP_EOL;
+            echo "date fin : $time diff : $diff", '<br />', PHP_EOL;
             
         }
         
@@ -259,7 +258,7 @@ class Log4GY extends Singleton{
         
         $reflexiveCallInfo = $this->getReflexiveInfo();
         
-        //TODO améliorer le systeme de génération d'identifiants uniques... Ya surement mieux possible !
+        //FIXME améliorer le systeme de génération d'identifiants uniques... Ya surement mieux possible !
         $callId = md5($reflexiveCallInfo['file'] . $reflexiveCallInfo['class'] . $reflexiveCallInfo['function']);
       
         return $callId;

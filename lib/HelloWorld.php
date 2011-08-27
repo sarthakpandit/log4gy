@@ -18,7 +18,7 @@ class HelloWorld{
         
         Log::info("Début - HelloWorld->doSpeack()");
         
-        echo 'Le message est : ', $this->message, PHP_EOL;
+        echo 'Le message est : ', $this->message, '<br />', PHP_EOL;
         
         Log::info("Fin - HelloWorld->doSpeack()");
         
