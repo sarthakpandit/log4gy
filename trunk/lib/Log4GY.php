@@ -9,25 +9,47 @@
  * @author Effy - Aurélien GY <http://www.aureliengy.com>.
  */
 abstract class Singleton{
-    
-  public static function getInstance(){
-      
-      static $instances = array();
-    
-      $class = get_called_class();
 
-      if (isset($instances[$class]) === false){
-          
-         $instances[$class] = new $class();
+    //FIXME tenté de foutre le singleton en session mais ca marche pas un cul :')
+    public static function getSessionInstance(){
 
-      }
+        session_start();
+        
+        if(! isset($_SESSION['Log4GY_instances'])){
+            $_SESSION['Log4GY_instances'] = array(); 
+        }
 
-      return $instances[$class];  
-   }
+        $class = get_called_class();
 
-   protected function __construct() {}
-   
-   protected function __clone() {}
+        if (! isset($_SESSION['Log4GY_instances'][$class])){
+
+            $_SESSION['Log4GY_instances'][$class] = new $class();
+
+        }
+        
+        return $_SESSION['Log4GY_instances'][$class];
+    }
+
+    public static function getInstance(){
+
+        static $instances = array();
+
+        $class = get_called_class();
+
+        if (isset($instances[$class]) === false){
+
+            $instances[$class] = new $class();
+
+        }
+
+        return $instances[$class];
+    }
+
+    protected function __construct() {
+    }
+     
+    protected function __clone() {
+    }
 
 }
 
@@ -133,6 +155,7 @@ class Log4GY extends Singleton{
     
         $this->tabProfiler = array();
         $seedDate = date('c');
+        
         $this->namePOTFile = $seedDate . '.log.txt';
       
         //TODO intialisation des fichiers / ouverture lecture ?
